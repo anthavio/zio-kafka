@@ -1,5 +1,6 @@
 package zio.kafka.admin
-
+case class AdminClientSettings()
+/*
 import org.apache.kafka.clients.admin.AdminClientConfig
 import zio.duration._
 
@@ -26,3 +27,4 @@ object AdminClientSettings {
   def apply(bootstrapServers: List[String]): AdminClientSettings =
     AdminClientSettings(bootstrapServers, 30.seconds, Map())
 }
+ */

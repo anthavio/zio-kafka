@@ -1,5 +1,6 @@
 package zio.kafka
-
+object KafkaFutureSpec
+/*
 import org.apache.kafka.common.internals.KafkaFutureImpl
 import zio._
 import zio.kafka.admin._
@@ -71,3 +72,4 @@ object KafkaFutureSpec extends DefaultRunnableSpec {
       }
     }
 }
+ */

@@ -1,5 +1,6 @@
 package zio.kafka.admin
-
+case class AdminClient()
+/*
 import org.apache.kafka.clients.admin.{
   AdminClient => JAdminClient,
   Config => JConfig,
@@ -24,8 +25,8 @@ case class AdminClient(private val adminClient: JAdminClient) {
   import AdminClient._
 
   /**
-   * Create multiple topics.
-   */
+ * Create multiple topics.
+ */
   def createTopics(
     newTopics: Iterable[NewTopic],
     createTopicOptions: Option[CreateTopicsOptions] = None
@@ -42,14 +43,14 @@ case class AdminClient(private val adminClient: JAdminClient) {
   }
 
   /**
-   * Create a single topic.
-   */
+ * Create a single topic.
+ */
   def createTopic(newTopic: NewTopic, validateOnly: Boolean = false): RIO[Blocking, Unit] =
     createTopics(List(newTopic), Some(new CreateTopicsOptions().validateOnly(validateOnly)))
 
   /**
-   * Delete multiple topics.
-   */
+ * Delete multiple topics.
+ */
   def deleteTopics(
     topics: Iterable[String],
     deleteTopicsOptions: Option[DeleteTopicsOptions] = None
@@ -66,14 +67,14 @@ case class AdminClient(private val adminClient: JAdminClient) {
   }
 
   /**
-   * Delete a single topic.
-   */
+ * Delete a single topic.
+ */
   def deleteTopic(topic: String): RIO[Blocking, Unit] =
     deleteTopics(List(topic))
 
   /**
-   * List the topics in the cluster.
-   */
+ * List the topics in the cluster.
+ */
   def listTopics(listTopicsOptions: Option[ListTopicsOptions] = None): RIO[Blocking, Map[String, TopicListing]] =
     fromKafkaFuture {
       blocking.effectBlocking(
@@ -82,8 +83,8 @@ case class AdminClient(private val adminClient: JAdminClient) {
     }.map(_.asScala.toMap)
 
   /**
-   * Describe the specified topics.
-   */
+ * Describe the specified topics.
+ */
   def describeTopics(
     topicNames: Iterable[String],
     describeTopicsOptions: Option[DescribeTopicsOptions] = None
@@ -99,8 +100,8 @@ case class AdminClient(private val adminClient: JAdminClient) {
   }
 
   /**
-   * Get the configuration for the specified resources.
-   */
+ * Get the configuration for the specified resources.
+ */
   def describeConfigs(
     configResources: Iterable[ConfigResource],
     describeConfigsOptions: Option[DescribeConfigsOptions] = None
@@ -116,8 +117,8 @@ case class AdminClient(private val adminClient: JAdminClient) {
   }
 
   /**
-   * Add new partitions to a topic.
-   */
+ * Add new partitions to a topic.
+ */
   def createPartitions(
     newPartitions: Map[String, NewPartitions],
     createPartitionsOptions: Option[CreatePartitionsOptions] = None
@@ -205,3 +206,4 @@ object AdminClient {
       ZIO(JAdminClient.create(settings.driverSettings.asJava)).map(ac => AdminClient(ac))
     )(client => ZIO.effectTotal(client.adminClient.close(settings.closeTimeout.asJava)))
 }
+ */

@@ -1,6 +1,6 @@
 package zio.kafka
 
-import net.manub.embeddedkafka.{ EmbeddedK, EmbeddedKafka, EmbeddedKafkaConfig }
+import net.manub.embeddedkafka.{ EmbeddedKafka, EmbeddedKafkaConfig }
 import zio._
 
 package object embedded {
@@ -12,9 +12,9 @@ package object embedded {
       def stop(): UIO[Unit]
     }
 
-    case class EmbeddedKafkaService(embeddedK: EmbeddedK) extends Service {
-      override def bootstrapServers: List[String] = List(s"localhost:${embeddedK.config.kafkaPort}")
-      override def stop(): UIO[Unit]              = ZIO.effectTotal(embeddedK.stop(true))
+    case class EmbeddedKafkaService(config: EmbeddedKafkaConfig) extends Service {
+      override def bootstrapServers: List[String] = List(s"localhost:${config.kafkaPort}")
+      override def stop(): UIO[Unit]              = ZIO.effectTotal(EmbeddedKafka.stop())
     }
 
     case object DefaultLocal extends Service {
@@ -26,7 +26,10 @@ package object embedded {
       implicit val embeddedKafkaConfig = EmbeddedKafkaConfig(
         customBrokerProperties = Map("group.min.session.timeout.ms" -> "500", "group.initial.rebalance.delay.ms" -> "0")
       )
-      ZManaged.make(ZIO.effect(EmbeddedKafkaService(EmbeddedKafka.start())))(_.stop())
+      ZManaged.make(ZIO.effect {
+        EmbeddedKafka.start()
+        EmbeddedKafkaService(embeddedKafkaConfig)
+      })(_.stop())
     }
 
     val local: ZLayer[Any, Nothing, Kafka] = ZLayer.succeed(DefaultLocal)

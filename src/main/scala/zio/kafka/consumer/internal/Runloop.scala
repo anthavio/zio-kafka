@@ -249,7 +249,7 @@ private[consumer] final class Runloop(
         if (requestedPartitions.nonEmpty) this.pollTimeout.asJava
         else 0.millis.asJava
 
-      c.poll(pollTimeout)
+      c.poll(pollTimeout.toMillis)
     } catch {
       // The consumer will throw an IllegalStateException if no call to subscribe
       // has been made yet, so we just ignore that. We have to poll even if c.subscription()

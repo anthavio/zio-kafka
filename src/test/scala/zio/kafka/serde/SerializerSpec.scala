@@ -1,6 +1,5 @@
 package zio.kafka.serde
 
-import org.apache.kafka.common.header.internals.RecordHeaders
 import zio.test.Assertion._
 import zio.test._
 
@@ -8,11 +7,11 @@ object SerializerSpec extends DefaultRunnableSpec {
   override def spec = suite("Serializer")(
     suite("asOption")(
       testM("serialize None values to null") {
-        assertM(stringSerializer.asOption.serialize("topic1", new RecordHeaders, None))(isNull)
+        assertM(stringSerializer.asOption.serialize("topic1", None))(isNull)
       },
       testM("serialize Some values") {
         checkM(Gen.anyString) { string =>
-          assertM(stringSerializer.asOption.serialize("topic1", new RecordHeaders, Some(string)))(
+          assertM(stringSerializer.asOption.serialize("topic1", Some(string)))(
             equalTo(string.getBytes)
           )
         }

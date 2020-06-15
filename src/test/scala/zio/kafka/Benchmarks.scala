@@ -55,7 +55,7 @@ object Plain {
     val pollDuration   = Duration.ofMillis(50)
 
     while (messageCounter < 1000000) {
-      val batch = consumer.poll(pollDuration)
+      val batch = consumer.poll(pollDuration.toMillis)
       println(s"Got batch of ${batch.count()}")
 
       batch.iterator().asScala.foreach { record =>

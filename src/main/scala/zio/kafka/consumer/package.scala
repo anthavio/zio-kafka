@@ -129,15 +129,18 @@ package object consumer {
         timeout: Duration = Duration.Infinity
       ): RIO[Blocking, Map[TopicPartition, Long]] =
         consumer.withConsumer(
-          _.beginningOffsets(partitions.asJava, timeout.asJava).asScala.view.mapValues(_.longValue()).toMap
+          _.beginningOffsets(partitions.asJava).asScala.view.mapValues(_.longValue()).toMap
         )
 
       override def committed(
         partitions: Set[TopicPartition],
         timeout: Duration = Duration.Infinity
       ): RIO[Blocking, Map[TopicPartition, Option[OffsetAndMetadata]]] =
-        consumer.withConsumer(
-          _.committed(partitions.asJava, timeout.asJava).asScala.toMap.view.mapValues(Option.apply).toMap
+        consumer.withConsumer(consumer =>
+          partitions.foldLeft(Map[TopicPartition, Option[OffsetAndMetadata]]()) {
+            case (acc, partition) =>
+              acc + (partition -> Option(consumer.committed(partition)))
+          }
         )
 
       override def endOffsets(
@@ -145,7 +148,7 @@ package object consumer {
         timeout: Duration = Duration.Infinity
       ): RIO[Blocking, Map[TopicPartition, Long]] =
         consumer.withConsumer { eo =>
-          val offs = eo.endOffsets(partitions.asJava, timeout.asJava)
+          val offs = eo.endOffsets(partitions.asJava)
           offs.asScala.view.mapValues(_.longValue()).toMap
         }
 
@@ -157,14 +160,14 @@ package object consumer {
         runloop.gracefulShutdown
 
       override def listTopics(timeout: Duration = Duration.Infinity): RIO[Blocking, Map[String, List[PartitionInfo]]] =
-        consumer.withConsumer(_.listTopics(timeout.asJava).asScala.view.mapValues(_.asScala.toList).toMap)
+        consumer.withConsumer(_.listTopics().asScala.view.mapValues(_.asScala.toList).toMap)
 
       override def offsetsForTimes(
         timestamps: Map[TopicPartition, Long],
         timeout: Duration = Duration.Infinity
       ): RIO[Blocking, Map[TopicPartition, OffsetAndTimestamp]] =
         consumer.withConsumer(
-          _.offsetsForTimes(timestamps.view.mapValues(Long.box).toMap.asJava, timeout.asJava).asScala.toMap
+          _.offsetsForTimes(timestamps.view.mapValues(Long.box).toMap.asJava).asScala.toMap
         )
 
       override def partitionedStream[R, K, V](
@@ -199,10 +202,10 @@ package object consumer {
         topic: String,
         timeout: Duration = Duration.Infinity
       ): RIO[Blocking, List[PartitionInfo]] =
-        consumer.withConsumer(_.partitionsFor(topic, timeout.asJava).asScala.toList)
+        consumer.withConsumer(_.partitionsFor(topic).asScala.toList)
 
       override def position(partition: TopicPartition, timeout: Duration = Duration.Infinity): RIO[Blocking, Long] =
-        consumer.withConsumer(_.position(partition, timeout.asJava))
+        consumer.withConsumer(_.position(partition))
 
       override def plainStream[R, K, V](
         keyDeserializer: Deserializer[R, K],

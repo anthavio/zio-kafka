@@ -8,7 +8,7 @@ import zio._
 import zio.blocking.Blocking
 import zio.clock.Clock
 import zio.duration._
-import zio.kafka.admin._
+//import zio.kafka.admin._
 import zio.kafka.consumer.Consumer.OffsetRetrieval
 import zio.kafka.consumer._
 import zio.kafka.consumer.diagnostics.Diagnostics
@@ -90,7 +90,7 @@ object KafkaTestUtils {
         Deserializer.string
       )(r)
     }
-
+  /*
   def adminSettings: ZIO[Kafka, Nothing, AdminClientSettings] =
     ZIO.access[Kafka](_.get[Kafka.Service].bootstrapServers).map(AdminClientSettings(_))
 
@@ -102,6 +102,7 @@ object KafkaTestUtils {
                .use(client => f(client))
                .provideSomeLayer[Kafka](Clock.live ++ Blocking.live)
     } yield fRes
+   */
   def randomThing(prefix: String): Task[String] =
     Task(UUID.randomUUID()).map(uuid => s"$prefix-$uuid")
 

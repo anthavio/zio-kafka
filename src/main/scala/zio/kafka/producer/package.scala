@@ -1,5 +1,6 @@
 package zio.kafka
 
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 
 import org.apache.kafka.clients.producer.{ Callback, KafkaProducer, ProducerRecord, RecordMetadata }
@@ -152,11 +153,12 @@ package object producer {
 
       private def serialize(r: ProducerRecord[K, V]): RIO[R, ByteRecord] =
         for {
-          key   <- keySerializer.serialize(r.topic, r.headers, r.key())
-          value <- valueSerializer.serialize(r.topic, r.headers, r.value())
-        } yield new ProducerRecord(r.topic, r.partition(), r.timestamp(), key, value, r.headers)
+          key   <- keySerializer.serialize(r.topic, r.key())
+          value <- valueSerializer.serialize(r.topic, r.value())
+        } yield new ProducerRecord(r.topic, r.partition(), r.timestamp(), key, value)
 
-      private[producer] def close: UIO[Unit] = UIO(p.close(producerSettings.closeTimeout.asJava))
+      private[producer] def close: UIO[Unit] =
+        UIO(p.close(producerSettings.closeTimeout.toMillis, TimeUnit.MILLISECONDS))
     }
 
     def live[R: Tag, K: Tag, V: Tag]: ZLayer[Has[Serializer[R, K]] with Has[Serializer[R, V]] with Has[
